@@ -7,13 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Coloring',
       home: RootWidget(),
@@ -28,40 +30,28 @@ class RootWidget extends StatefulWidget {
   _RootWidgetState createState() => _RootWidgetState();
 }
 
-final List<String> photos = [
-  photo1,
-  photo2,
-  photo3,
-  photo4,
-  photo5,
-  photo6,
-  photo7,
-  photo8,
-  photo9,
-  photo10,
-  photo11
+final List<Uri> photos = [
+  Uri.parse(
+      'https://iaa-network.com/wp-content/uploads/2021/03/Seychelles-arbitration-1.jpg'),
+  Uri.parse('https://i.imgur.com/bmwGs4n.png'),
+  Uri.parse(
+      'https://media.tacdn.com/media/attractions-splice-spp-674x446/07/6f/f1/aa.jpg'),
+  Uri.parse(
+      'https://i.pinimg.com/originals/20/0b/95/200b95dfb2efa80d37479764a324b462.jpg'),
+  Uri.parse(
+      'https://assets.rappler.co/612F469A6EA84F6BAE882D2B94A4B421/img/CDCC3B2965FC403F94CD4F3B158F1788/image-2019-01-21-3.jpg'),
+  Uri.parse('https://cdn.wallpapersafari.com/68/60/HgzJbQ.jpg'),
+  Uri.parse('https://wallpaperaccess.com/full/3879268.jpg'),
+  Uri.parse('https://wallpapercave.com/wp/wp2461878.jpg'),
+  Uri.parse('https://wallpapercave.com/wp/gLCTnod.jpg'),
+  Uri.parse(
+      'https://c4.wallpaperflare.com/wallpaper/827/998/515/ice-cream-4k-in-hd-quality-wallpaper-preview.jpg'),
+  Uri.parse(
+      'https://img5.goodfon.com/wallpaper/nbig/e/93/tort-malina-shokolad.jpg'),
 ];
 
-final String photo1 =
-    'https://iaa-network.com/wp-content/uploads/2021/03/Seychelles-arbitration-1.jpg';
-final String photo2 = 'https://i.imgur.com/bmwGs4n.png';
-final String photo3 =
-    'https://media.tacdn.com/media/attractions-splice-spp-674x446/07/6f/f1/aa.jpg';
-final String photo4 =
-    'https://i.pinimg.com/originals/20/0b/95/200b95dfb2efa80d37479764a324b462.jpg';
-
-final String photo5 =
-    'https://assets.rappler.co/612F469A6EA84F6BAE882D2B94A4B421/img/CDCC3B2965FC403F94CD4F3B158F1788/image-2019-01-21-3.jpg';
-final String photo6 = 'https://cdn.wallpapersafari.com/68/60/HgzJbQ.jpg';
-final String photo7 = 'https://wallpaperaccess.com/full/3879268.jpg';
-final String photo8 = 'https://wallpapercave.com/wp/wp2461878.jpg';
-final String photo9 = 'https://wallpapercave.com/wp/gLCTnod.jpg';
-final String photo10 =
-    'https://c4.wallpaperflare.com/wallpaper/827/998/515/ice-cream-4k-in-hd-quality-wallpaper-preview.jpg';
-final String photo11 =
-    'https://img5.goodfon.com/wallpaper/nbig/e/93/tort-malina-shokolad.jpg';
-
-String photo = photo1;
+int photoIndex = 0;
+var photo = photos[photoIndex];
 
 int noOfPaletteColors = 4;
 
@@ -96,7 +86,7 @@ class _RootWidgetState extends State<RootWidget> {
               onPressed: () {
                 extractColors();
               },
-              icon: Icon(Icons.refresh))
+              icon: const Icon(Icons.refresh))
         ],
         title: Text(
           'Coloring',
@@ -110,7 +100,7 @@ class _RootWidgetState extends State<RootWidget> {
                 : LinearGradient(
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
-                    stops: [0.01, 0.6, 1],
+                    stops: const [0.01, 0.6, 1],
                     colors: [
                       palette.first.withOpacity(0.3),
                       palette[palette.length ~/ 2],
@@ -119,30 +109,30 @@ class _RootWidgetState extends State<RootWidget> {
                   )),
         child: ListView(
           children: [
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             SizedBox(
-              child: imageBytes != null && imageBytes!.length > 0
+              child: imageBytes != null && imageBytes!.isNotEmpty
                   ? Image.memory(
                       imageBytes!,
                       fit: BoxFit.fill,
                     )
-                  : Center(child: CircularProgressIndicator()),
+                  : const Center(child: CircularProgressIndicator()),
               height: 300,
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             _getGrids(),
             Container(
               color: Colors.white.withOpacity(0.5),
-              padding: EdgeInsets.only(top: 6, bottom: 16),
+              padding: const EdgeInsets.only(top: 6, bottom: 16),
               alignment: Alignment.center,
               child: Column(
                 children: [
                   Text('Palette of $noOfPaletteColors colors:'),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   _getPalette()
                 ],
               ),
@@ -162,11 +152,11 @@ class _RootWidgetState extends State<RootWidget> {
     setState(() {});
 
     noOfPaletteColors = random.nextInt(4) + 2;
-    photo = photos[random.nextInt(photos.length)];
+    photoIndex = (photoIndex + 1) % photos.length;
+    photo = photos[photoIndex];
 
-    imageBytes = (await NetworkAssetBundle(Uri.parse(photo)).load(photo))
-        .buffer
-        .asUint8List();
+    imageBytes =
+        (await NetworkAssetBundle(photo).load(photo.path)).buffer.asUint8List();
 
     colors = await compute(extractPixelsColors, imageBytes);
     setState(() {});
@@ -189,7 +179,7 @@ class _RootWidgetState extends State<RootWidget> {
             flex: 1,
             child: colors.isEmpty
                 ? Container(
-                    child: CircularProgressIndicator(),
+                    child: const CircularProgressIndicator(),
                     alignment: Alignment.center,
                     height: 200,
                   )
@@ -201,7 +191,7 @@ class _RootWidgetState extends State<RootWidget> {
                             color:
                                 palette.isEmpty ? Colors.black : palette.first),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       GridView.builder(
                           shrinkWrap: true,
                           gridDelegate:
@@ -219,12 +209,12 @@ class _RootWidgetState extends State<RootWidget> {
                     ],
                   ),
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Expanded(
             flex: 1,
             child: sortedColors.isEmpty
                 ? Container(
-                    child: CircularProgressIndicator(),
+                    child: const CircularProgressIndicator(),
                     alignment: Alignment.center,
                     height: 200,
                   )
@@ -236,7 +226,7 @@ class _RootWidgetState extends State<RootWidget> {
                             color:
                                 palette.isEmpty ? Colors.black : palette.first),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       GridView.builder(
                           shrinkWrap: true,
                           gridDelegate:
@@ -264,7 +254,7 @@ class _RootWidgetState extends State<RootWidget> {
       height: 50,
       child: palette.isEmpty
           ? Container(
-              child: CircularProgressIndicator(),
+              child: const CircularProgressIndicator(),
               alignment: Alignment.center,
               height: 100,
             )

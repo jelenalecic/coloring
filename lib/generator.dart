@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:image/image.dart' as imageLib;
+import 'package:image/image.dart' as image_lib;
 
 const String keyPalette = 'palette';
 const String keyNoOfItems = 'noIfItems';
@@ -9,19 +9,22 @@ const String keyNoOfItems = 'noIfItems';
 int noOfPixelsPerAxis = 12;
 
 Color getAverageColor(List<Color> colors) {
-  int r = 0, g = 0, b = 0;
+  double h = 0, s = 0, l = 0;
 
   for (int i = 0; i < colors.length; i++) {
-    r += colors[i].red;
-    g += colors[i].green;
-    b += colors[i].blue;
+    final color = HSLColor.fromColor(
+      Color.fromRGBO(colors[i].red, colors[i].green, colors[i].blue, 1),
+    );
+    h += color.hue;
+    s += color.saturation;
+    l += color.lightness;
   }
 
-  r = r ~/ colors.length;
-  g = g ~/ colors.length;
-  b = b ~/ colors.length;
+  h = h / colors.length;
+  s = s / colors.length;
+  l = l / colors.length;
 
-  return Color.fromRGBO(r, g, b, 1);
+  return HSLColor.fromAHSL(1, h, s, l).toColor();
 }
 
 Color abgrToColor(int argbColor) {
@@ -64,7 +67,7 @@ List<Color> extractPixelsColors(Uint8List? bytes) {
   List<Color> colors = [];
 
   List<int> values = bytes!.buffer.asUint8List();
-  imageLib.Image? image = imageLib.decodeImage(values);
+  image_lib.Image? image = image_lib.decodeImage(values);
 
   List<int?> pixels = [];
 
